@@ -16,6 +16,9 @@ const { testConnection } = require('./config/db');
 
 const app = express();
 
+// Trust proxy headers for secure rate limiting in production behind reverse proxies
+app.set('trust proxy', 1);
+
 // 1. Apply Global Middlewares
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' && process.env.FRONTEND_URL 

@@ -42,6 +42,8 @@ if (dbUri) {
 // Enable secure TLS/SSL transport in production or if explicitly requested via DB_SSL env
 const enableSSL = process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true';
 
+console.log(`[DB INFO] Initializing MySQL pool. Host: ${poolConfig.host}, Port: ${poolConfig.port}, Database: ${poolConfig.database}, User: ${poolConfig.user}, SSL Enabled: ${enableSSL}`);
+
 const pool = mysql.createPool({
   ...poolConfig,
   waitForConnections: true,
@@ -49,7 +51,7 @@ const pool = mysql.createPool({
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 10000,
-  ...(enableSSL ? { ssl: { minVersion: 'TLSv1.2', rejectUnauthorized: true } } : {})
+  ...(enableSSL ? { ssl: { rejectUnauthorized: false } } : {})
 });
 
 

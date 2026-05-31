@@ -106,7 +106,7 @@ const initDatabase = async () => {
           if (upperStmt.startsWith('CREATE DATABASE') || upperStmt.startsWith('USE')) {
             continue; // Skip DB creation since pool is already connected directly to the database
           }
-          await connection.execute(statement);
+          await connection.query(statement);
         }
         console.log('[DB INFO] Database schema tables initialized successfully!');
       } finally {

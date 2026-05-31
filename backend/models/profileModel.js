@@ -62,7 +62,7 @@ const Profile = {
       githubCreatedAt
     ];
 
-    const [result] = await pool.execute(query, values);
+    const [result] = await pool.query(query, values);
     return result;
   },
 
@@ -100,7 +100,7 @@ const Profile = {
     }
 
     const countQuery = `SELECT COUNT(*) as total ${baseQuery}`;
-    const [countRows] = await pool.execute(countQuery, queryParams);
+    const [countRows] = await pool.query(countQuery, queryParams);
     const totalRecords = countRows[0].total;
 
     const allowedSortFields = ['profile_score', 'followers', 'public_repos', 'total_stars', 'created_at', 'username'];
@@ -109,7 +109,7 @@ const Profile = {
 
     const selectQuery = `SELECT * ${baseQuery} ORDER BY ${safeSortBy} ${safeOrder} LIMIT ? OFFSET ?`;
     const selectParams = [...queryParams, parseInt(limit, 10), parseInt(offset, 10)];
-    const [rows] = await pool.execute(selectQuery, selectParams);
+    const [rows] = await pool.query(selectQuery, selectParams);
 
     const parsedRows = rows.map(row => {
       if (row.recent_activity_insights && typeof row.recent_activity_insights === 'string') {
@@ -136,7 +136,7 @@ const Profile = {
    */
   getById: async (id) => {
     const query = 'SELECT * FROM profiles WHERE id = ?';
-    const [rows] = await pool.execute(query, [id]);
+    const [rows] = await pool.query(query, [id]);
     
     if (rows.length === 0) return null;
     
@@ -156,7 +156,7 @@ const Profile = {
    */
   getByUsername: async (username) => {
     const query = 'SELECT * FROM profiles WHERE username = ?';
-    const [rows] = await pool.execute(query, [username.toLowerCase()]);
+    const [rows] = await pool.query(query, [username.toLowerCase()]);
     
     if (rows.length === 0) return null;
     
@@ -180,7 +180,7 @@ const Profile = {
       VALUES (?, ?, ?, ?)
     `;
     try {
-      const [result] = await pool.execute(query, [
+      const [result] = await pool.query(query, [
         username.toLowerCase(),
         ipAddress || '127.0.0.1',
         status,
@@ -198,7 +198,7 @@ const Profile = {
    */
   getSearchLogs: async (limit = 50) => {
     const query = 'SELECT * FROM search_history ORDER BY searched_at DESC LIMIT ?';
-    const [rows] = await pool.execute(query, [parseInt(limit, 10)]);
+    const [rows] = await pool.query(query, [parseInt(limit, 10)]);
     return rows;
   }
 };

@@ -1,5 +1,7 @@
 const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
+const fs = require('fs');
+const path = require('path');
 
 // Load environment variables
 dotenv.config();
@@ -68,7 +70,57 @@ const testConnection = async () => {
   }
 };
 
+// Helper to automatically initialize database schema tables if missing
+const initDatabase = async () => {
+  try {
+    console.log('[DB INFO] Verifying database schema tables...');
+    
+    let tablesExist = false;
+    try {
+      await pool.execute('SELECT 1 FROM profiles LIMIT 1');
+      await pool.execute('SELECT 1 FROM search_history LIMIT 1');
+      tablesExist = true;
+      console.log('[DB INFO] Database schema tables verified successfully.');
+    } catch (e) {
+      console.warn('[DB WARNING] Database tables are missing. Starting automatic schema initialization...');
+    }
+
+    if (!tablesExist) {
+      const schemaPath = path.join(__dirname, '../../database/schema.sql');
+      const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+      
+      const statements = schemaSql
+        .split(';')
+        .map(stmt => stmt.trim())
+        .filter(stmt => {
+          if (stmt.length === 0) return false;
+          // Clean up SQL comment blocks
+          if (stmt.startsWith('--') || stmt.startsWith('/*')) return false;
+          return true;
+        });
+
+      const connection = await pool.getConnection();
+      try {
+        for (const statement of statements) {
+          const upperStmt = statement.toUpperCase();
+          if (upperStmt.startsWith('CREATE DATABASE') || upperStmt.startsWith('USE')) {
+            continue; // Skip DB creation since pool is already connected directly to the database
+          }
+          await connection.execute(statement);
+        }
+        console.log('[DB INFO] Database schema tables initialized successfully!');
+      } finally {
+        connection.release();
+      }
+    }
+  } catch (error) {
+    console.error('[DB ERROR] Failed to automatically initialize database schema tables:', error.message);
+  }
+};
+
 module.exports = {
   pool,
-  testConnection
+  testConnection,
+  initDatabase
 };
+

@@ -1,5 +1,6 @@
 const app = require('./app');
-const { testConnection } = require('./config/db');
+const { testConnection, initDatabase } = require('./config/db');
+
 
 // Low-level synchronous uncaught exception catcher
 process.on('uncaughtException', (err) => {
@@ -12,9 +13,13 @@ const PORT = process.env.PORT || 5001;
 const startServer = async () => {
   // 1. Establish and test MySQL Connection
   const isDbConnected = await testConnection();
-  if (!isDbConnected) {
+  if (isDbConnected) {
+    // Automatically verify/initialize database schema tables if missing
+    await initDatabase();
+  } else {
     console.warn('[DB WARNING] Database is currently offline. Ensure MySQL is configured correctly and running.');
   }
+
 
   // 2. Open HTTP Listener Port
   const server = app.listen(PORT, () => {

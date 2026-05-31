@@ -1,0 +1,204 @@
+{
+	"info": {
+		"_postman_id": "8c59efd5-d852-4752-9447-d5d144365df9",
+		"name": "GitGauge API Testing",
+		"description": "Production-ready backend API collection to fetch, store, analyze, and classification-sort GitHub profiles using Node.js, Express, and MySQL.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "System Health",
+			"item": [
+				{
+					"name": "Health Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Checks the operational status of the server."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profiles Management",
+			"item": [
+				{
+					"name": "Analyze GitHub Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Response is standardized success structure\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.data).to.have.property('username');",
+									"    pm.expect(jsonData.data).to.have.property('profile_score');",
+									"    pm.expect(jsonData.data).to.have.property('developer_level');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/profile/:username",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"profile",
+								":username"
+							],
+							"variable": [
+								{
+									"key": "username",
+									"value": "torvalds",
+									"description": "GitHub user login handle"
+								}
+							]
+						},
+						"description": "Live analysis of a GitHub handle."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Analyzed Profiles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Response contains profiles data and pagination meta\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    pm.expect(jsonData.meta).to.have.property('total');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/profiles?page=1&limit=10&sortBy=profile_score&order=desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"profiles"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "profile_score"
+								},
+								{
+									"key": "order",
+									"value": "desc"
+								}
+							]
+						},
+						"description": "Lists all computed evaluations stored locally."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile by Database ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/profiles/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"profiles",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Fetches details of a single analyzed developer profile from the database."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Search Audit Logs",
+			"item": [
+				{
+					"name": "Get Search History Logs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/history?limit=25",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"history"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "25"
+								}
+							]
+						},
+						"description": "Fetches a chronological log of query attempts."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5001",
+			"type": "string"
+		}
+	]
+}

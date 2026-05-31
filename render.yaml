@@ -1,0 +1,49 @@
+services:
+  # 1. Express Backend Web Service
+  - type: web
+    name: gitgauge-backend
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        fromDatabase:
+          name: gitgauge-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: gitgauge-db
+          property: port
+      - key: DB_USER
+        fromDatabase:
+          name: gitgauge-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: gitgauge-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: gitgauge-db
+          property: database
+      - key: DATABASE_URL
+        fromDatabase:
+          name: gitgauge-db
+          property: connectionString
+      - key: GITHUB_API_TOKEN
+        sync: false # Will require manual entry in the Render dashboard for security
+      - key: FRONTEND_URL
+        sync: false # Will require manual entry of Vercel production URL
+
+databases:
+  # 2. Managed MySQL Database
+  - name: gitgauge-db
+    databaseName: github_analyzer
+    user: root
+    plan: free

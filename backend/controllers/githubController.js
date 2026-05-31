@@ -123,7 +123,8 @@ const analyzeEvents = (events = []) => {
 };
 
 const getClientIp = (req) => {
-  return req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  return ip.split(',')[0].trim();
 };
 
 const githubController = {

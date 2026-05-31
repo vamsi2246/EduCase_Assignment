@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS search_history (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL,
     searched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ip_address VARCHAR(45),
+    ip_address VARCHAR(255),
     status VARCHAR(20) NOT NULL, -- 'SUCCESS', 'FAILED', 'NOT_FOUND'
     error_message TEXT,
     

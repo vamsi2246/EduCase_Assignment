@@ -89,15 +89,15 @@ const initDatabase = async () => {
       const schemaPath = path.join(__dirname, '../database/schema.sql');
       const schemaSql = fs.readFileSync(schemaPath, 'utf8');
       
-      const statements = schemaSql
+      const cleanSql = schemaSql
+        .split('\n')
+        .filter(line => !line.trim().startsWith('--') && !line.trim().startsWith('#'))
+        .join('\n');
+
+      const statements = cleanSql
         .split(';')
         .map(stmt => stmt.trim())
-        .filter(stmt => {
-          if (stmt.length === 0) return false;
-          // Clean up SQL comment blocks
-          if (stmt.startsWith('--') || stmt.startsWith('/*')) return false;
-          return true;
-        });
+        .filter(stmt => stmt.length > 0);
 
       const connection = await pool.getConnection();
       try {

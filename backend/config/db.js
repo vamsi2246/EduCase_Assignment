@@ -86,7 +86,7 @@ const initDatabase = async () => {
     }
 
     if (!tablesExist) {
-      const schemaPath = path.join(__dirname, '../../database/schema.sql');
+      const schemaPath = path.join(__dirname, '../database/schema.sql');
       const schemaSql = fs.readFileSync(schemaPath, 'utf8');
       
       const statements = schemaSql
